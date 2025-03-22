@@ -1,0 +1,27 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: windows-latest
+    steps:
+      - name: Клонування репозиторію
+        uses: actions/checkout@v2
+
+      - name: Збірка застосунку
+        run: mvn clean install
+
+      - name: Копіювання артефактів на сервер
+        run: |
+          echo "Копіюємо файли на сервер..."
+          scp -r target\* user@windows-server:C:\deploy-folder
+
+      - name: Розгортання застосунку
+        run: |
+          echo "Запуск застосунку..."
+          ssh user@windows-server "cd C:\deploy-folder && start java -jar myapp.jar"
+
